@@ -20,7 +20,7 @@ const mockCreateChart = vi.fn(() => ({
 }));
 
 vi.mock('lightweight-charts', () => ({
-  createChart: (...args: unknown[]) => mockCreateChart(...args),
+  createChart: mockCreateChart,
   CandlestickSeries: 'CandlestickSeries',
 }));
 
