@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans, Outfit } from 'next/font/google';
 import { AppProviders } from '@/providers/app-providers';
 import './globals.css';
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-dm-sans',
   display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
+  variable: '--font-outfit',
   display: 'swap',
 });
 
@@ -48,11 +48,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`${dmSans.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body className="bg-background min-h-screen font-sans antialiased">
         <AppProviders>{children}</AppProviders>
       </body>

@@ -21,7 +21,7 @@ interface BarChartProps {
   color?: string;
 }
 
-export function BarChart({ data, height = 300, color = 'var(--color-brand-500)' }: BarChartProps) {
+export function BarChart({ data, height = 300, color = 'var(--color-primary)' }: BarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RechartsBarChart data={data}>
