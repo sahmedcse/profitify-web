@@ -12,7 +12,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>{children}</TooltipProvider>
       </ThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />
