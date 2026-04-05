@@ -42,10 +42,7 @@ describe('BarChart', () => {
 
     expect(container.querySelector('[data-testid="responsive-container"]')).toBeInTheDocument();
     expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-testid="bar-chart"]')).toHaveAttribute(
-      'data-count',
-      '3',
-    );
+    expect(container.querySelector('[data-testid="bar-chart"]')).toHaveAttribute('data-count', '3');
   });
 
   it('renders chart axes and grid', () => {
