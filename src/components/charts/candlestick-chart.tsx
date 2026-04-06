@@ -23,8 +23,8 @@ export function CandlestickChart({ data, height = 400 }: CandlestickChartProps) 
 
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
-    const profit = computedStyle.getPropertyValue('--color-profit').trim() || '#16a34a';
-    const loss = computedStyle.getPropertyValue('--color-loss').trim() || '#dc2626';
+    const profit = computedStyle.getPropertyValue('--color-profit').trim() || '#34d399';
+    const loss = computedStyle.getPropertyValue('--color-loss').trim() || '#f87171';
 
     const chart = createChart(containerRef.current, {
       height,

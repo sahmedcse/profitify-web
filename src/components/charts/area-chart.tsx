@@ -21,11 +21,7 @@ interface AreaChartProps {
   color?: string;
 }
 
-export function AreaChart({
-  data,
-  height = 300,
-  color = 'var(--color-brand-500)',
-}: AreaChartProps) {
+export function AreaChart({ data, height = 300, color = 'var(--color-primary)' }: AreaChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RechartsAreaChart data={data}>
