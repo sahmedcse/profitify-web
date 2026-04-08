@@ -1,28 +1,70 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, within } from '@testing-library/react';
-import DashboardPage from '../page';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { DashboardClient } from '../dashboard-client';
 
-describe('DashboardPage', () => {
-  it('renders the Dashboard heading', () => {
-    const { container } = render(<DashboardPage />);
+vi.mock('recharts', () => {
+  const Pass = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+  const Empty = () => null;
+  return {
+    ResponsiveContainer: Pass,
+    AreaChart: Pass,
+    Area: Empty,
+    BarChart: Pass,
+    Bar: Pass,
+    Cell: Empty,
+    LineChart: Pass,
+    Line: Empty,
+    XAxis: Empty,
+    YAxis: Empty,
+    CartesianGrid: Empty,
+    Tooltip: Empty,
+    ReferenceLine: Empty,
+  };
+});
 
-    expect(within(container).getByText('Dashboard')).toBeInTheDocument();
-  });
+function renderDashboard() {
+  return render(
+    <TooltipProvider>
+      <DashboardClient />
+    </TooltipProvider>,
+  );
+}
 
-  it('renders all 4 metric cards', () => {
-    const { container } = render(<DashboardPage />);
+describe('DashboardClient', () => {
+  it('renders the initially selected stock (AAPL)', () => {
+    const { container } = renderDashboard();
     const view = within(container);
-
-    expect(view.getByText('Total Value')).toBeInTheDocument();
-    expect(view.getByText('Daily P&L')).toBeInTheDocument();
-    expect(view.getByText('Total Return')).toBeInTheDocument();
-    expect(view.getByText('Open Positions')).toBeInTheDocument();
+    expect(view.getAllByText('AAPL').length).toBeGreaterThan(0);
+    expect(view.getAllByText('Apple Inc.').length).toBeGreaterThan(0);
   });
 
-  it('shows placeholder values', () => {
-    const { container } = render(<DashboardPage />);
+  it('renders all major dashboard section titles', () => {
+    const { container } = renderDashboard();
+    const view = within(container);
+    expect(view.getByText('Price Action')).toBeInTheDocument();
+    expect(view.getByText('Volume')).toBeInTheDocument();
+    // "MACD" appears both as the chart title and as an indicator row.
+    expect(view.getAllByText('MACD').length).toBeGreaterThan(0);
+    expect(view.getByText('Stock vs Stock')).toBeInTheDocument();
+    expect(view.getByText('Technical Indicators')).toBeInTheDocument();
+    expect(view.getByText('Key Data')).toBeInTheDocument();
+    expect(view.getByText('Support & Resistance')).toBeInTheDocument();
+  });
 
-    const placeholders = within(container).getAllByText('--');
-    expect(placeholders).toHaveLength(4);
+  it('renders sample indicator and fundamental rows', () => {
+    const { container } = renderDashboard();
+    const view = within(container);
+    expect(view.getByText('RSI (14)')).toBeInTheDocument();
+    expect(view.getByText('Market Cap')).toBeInTheDocument();
+  });
+
+  it('renders the curated stock list in the sidebar', () => {
+    const { container } = renderDashboard();
+    const view = within(container);
+    // Picker rows include all 8 stock symbols.
+    expect(view.getAllByText('MSFT').length).toBeGreaterThan(0);
+    expect(view.getAllByText('NVDA').length).toBeGreaterThan(0);
+    expect(view.getAllByText('TSLA').length).toBeGreaterThan(0);
   });
 });
