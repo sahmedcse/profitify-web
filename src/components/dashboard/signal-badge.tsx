@@ -1,7 +1,14 @@
-import { CheckCircle, MinusCircle, TrendingDown, TrendingUp, type LucideIcon } from 'lucide-react';
+import {
+  CheckCircle,
+  MinusCircle,
+  TrendingDown,
+  TrendingUp,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import type { Signal } from '@/lib/dashboard-data';
+import type { Signal } from '@/types/dashboard';
 
 type Props = {
   signal: Signal;
@@ -18,6 +25,8 @@ function styleFor(signal: Signal): { Icon: LucideIcon; classes: string } {
       return { Icon: MinusCircle, classes: 'bg-gold-soft text-gold' };
     case 'Bearish':
       return { Icon: TrendingDown, classes: 'bg-loss-soft text-loss' };
+    case 'Strong Sell':
+      return { Icon: XCircle, classes: 'bg-loss-soft text-loss' };
   }
 }
 

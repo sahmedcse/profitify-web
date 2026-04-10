@@ -9,9 +9,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import type { Indicator } from '@/lib/dashboard-data';
+import type { Indicator } from '@/types/dashboard';
 
-type Props = { indicators: Indicator[] };
+type Props = { indicators: Indicator[] | undefined };
 
 const STATUS_DOT: Record<Indicator['status'], string> = {
   bullish: 'bg-accent-green',
@@ -20,9 +20,10 @@ const STATUS_DOT: Record<Indicator['status'], string> = {
 };
 
 export function IndicatorsTable({ indicators }: Props) {
-  const buy = indicators.filter((i) => i.status === 'bullish').length;
-  const neutral = indicators.filter((i) => i.status === 'neutral').length;
-  const sell = indicators.filter((i) => i.status === 'bearish').length;
+  const rows = indicators ?? [];
+  const buy = rows.filter((i) => i.status === 'bullish').length;
+  const neutral = rows.filter((i) => i.status === 'neutral').length;
+  const sell = rows.filter((i) => i.status === 'bearish').length;
 
   return (
     <Card
@@ -63,7 +64,17 @@ export function IndicatorsTable({ indicators }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {indicators.map((ind) => (
+            {rows.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="text-muted-foreground py-6 text-center text-[11px]"
+                >
+                  No indicators available yet
+                </TableCell>
+              </TableRow>
+            )}
+            {rows.map((ind) => (
               <TableRow key={ind.name}>
                 <TableCell className="font-display text-foreground text-[12px] font-semibold">
                   {ind.name}

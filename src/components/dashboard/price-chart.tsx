@@ -17,7 +17,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 
 type Props = {
-  data: { t: number; price: number }[];
+  data: { t: number; price: number }[] | undefined;
   up: boolean;
 };
 
@@ -65,40 +65,55 @@ export function PriceChart({ data, up }: Props) {
         </CardAction>
       </CardHeader>
       <CardContent className="px-5">
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={data} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.35} />
-                <stop offset="100%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-            <XAxis
-              dataKey="t"
-              tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-              axisLine={false}
-              tickLine={false}
-              interval={9}
-            />
-            <YAxis
-              tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-              axisLine={false}
-              tickLine={false}
-              width={36}
-              domain={['auto', 'auto']}
-            />
-            <Tooltip content={MiniTooltip} cursor={{ stroke: 'var(--border)' }} />
-            <Area
-              type="monotone"
-              dataKey="price"
-              stroke={color}
-              strokeWidth={2}
-              fill="url(#priceFill)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {!data || data.length === 0 ? (
+          <ChartEmptyState height={200} label="No price data yet" />
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={data} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="t"
+                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                axisLine={false}
+                tickLine={false}
+                interval={9}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                axisLine={false}
+                tickLine={false}
+                width={36}
+                domain={['auto', 'auto']}
+              />
+              <Tooltip content={MiniTooltip} cursor={{ stroke: 'var(--border)' }} />
+              <Area
+                type="monotone"
+                dataKey="price"
+                stroke={color}
+                strokeWidth={2}
+                fill="url(#priceFill)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+function ChartEmptyState({ height, label }: { height: number; label: string }) {
+  return (
+    <div
+      className="text-muted-foreground flex items-center justify-center rounded-md text-[11px]"
+      style={{ height }}
+    >
+      {label}
+    </div>
   );
 }

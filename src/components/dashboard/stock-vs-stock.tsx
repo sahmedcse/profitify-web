@@ -25,16 +25,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SignalBadge } from './signal-badge';
-import { stocks, comparisonData } from '@/lib/dashboard-data';
+import { useCompare } from '@/hooks/use-dashboard';
+import type { ComparePeriod, Stock } from '@/types/dashboard';
 import { cn } from '@/lib/utils';
 
-const PERIODS = ['3M', '6M', '1Y'] as const;
-type Period = (typeof PERIODS)[number];
+const PERIODS: readonly ComparePeriod[] = ['3M', '6M', '1Y'];
 
-const PERIOD_WEEKS: Record<Period, number> = {
-  '3M': 13,
-  '6M': 26,
-  '1Y': 52,
+type Props = {
+  stocks: Stock[];
 };
 
 function CompTooltip({ active, payload, label }: TooltipContentProps<ValueType, NameType>) {
@@ -57,16 +55,24 @@ function CompTooltip({ active, payload, label }: TooltipContentProps<ValueType, 
   );
 }
 
-export function StockVsStock() {
-  const [compareA, setCompareA] = useState('AAPL');
-  const [compareB, setCompareB] = useState('MSFT');
-  const [period, setPeriod] = useState<Period>('1Y');
+export function StockVsStock({ stocks }: Props) {
+  const [pickedA, setPickedA] = useState<string | undefined>(undefined);
+  const [pickedB, setPickedB] = useState<string | undefined>(undefined);
+  const [period, setPeriod] = useState<ComparePeriod>('1Y');
 
-  const slice = comparisonData.slice(-PERIOD_WEEKS[period]);
-  const stockA = stocks.find((s) => s.symbol === compareA)!;
-  const stockB = stocks.find((s) => s.symbol === compareB)!;
-  const lastA = Number(slice[slice.length - 1][compareA]);
-  const lastB = Number(slice[slice.length - 1][compareB]);
+  // Default A/B to the first two available stocks until the user picks.
+  // Derived during render to avoid `react-hooks/set-state-in-effect`.
+  const compareA = pickedA ?? stocks[0]?.symbol;
+  const compareB = pickedB ?? stocks[1]?.symbol;
+
+  const { data: series } = useCompare(compareA, compareB, period);
+  const rows = series ?? [];
+
+  const stockA = stocks.find((s) => s.symbol === compareA);
+  const stockB = stocks.find((s) => s.symbol === compareB);
+  const last = rows[rows.length - 1];
+  const lastA = last && compareA ? Number(last[compareA]) : 0;
+  const lastB = last && compareB ? Number(last[compareB]) : 0;
 
   return (
     <Card
@@ -97,10 +103,10 @@ export function StockVsStock() {
           <PickerPanel
             label="Stock A"
             value={compareA}
-            onChange={setCompareA}
+            onChange={setPickedA}
+            stocks={stocks}
             perf={lastA}
-            stockName={stockA.name}
-            stockSignal={stockA.signal}
+            stock={stockA}
             colorVar="var(--primary)"
           />
           <div className="flex items-center justify-center">
@@ -111,61 +117,71 @@ export function StockVsStock() {
           <PickerPanel
             label="Stock B"
             value={compareB}
-            onChange={setCompareB}
+            onChange={setPickedB}
+            stocks={stocks}
             perf={lastB}
-            stockName={stockB.name}
-            stockSignal={stockB.signal}
+            stock={stockB}
             colorVar="var(--gold)"
           />
         </div>
 
         <div className="mt-4">
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={slice} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                dataKey="week"
-                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-                axisLine={false}
-                tickLine={false}
-                interval={Math.floor(slice.length / 6)}
-              />
-              <YAxis
-                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-                axisLine={false}
-                tickLine={false}
-                width={42}
-                tickFormatter={(v) => `${v >= 0 ? '+' : ''}${v}%`}
-              />
-              <Tooltip content={CompTooltip} cursor={{ stroke: 'var(--border)' }} />
-              <ReferenceLine y={0} stroke="var(--border)" strokeDasharray="2 2" />
-              <Line
-                type="monotone"
-                dataKey={compareA}
-                stroke="var(--primary)"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                type="monotone"
-                dataKey={compareB}
-                stroke="var(--gold)"
-                strokeWidth={2}
-                strokeDasharray="4 4"
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {rows.length === 0 ? (
+            <div className="text-muted-foreground flex h-[220px] items-center justify-center rounded-md text-[11px]">
+              No comparison data yet
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={rows} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="week"
+                  tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={Math.max(1, Math.floor(rows.length / 6))}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={42}
+                  tickFormatter={(v) => `${v >= 0 ? '+' : ''}${v}%`}
+                />
+                <Tooltip content={CompTooltip} cursor={{ stroke: 'var(--border)' }} />
+                <ReferenceLine y={0} stroke="var(--border)" strokeDasharray="2 2" />
+                {compareA && (
+                  <Line
+                    type="monotone"
+                    dataKey={compareA}
+                    stroke="var(--primary)"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+                {compareB && (
+                  <Line
+                    type="monotone"
+                    dataKey={compareB}
+                    stroke="var(--gold)"
+                    strokeWidth={2}
+                    strokeDasharray="4 4"
+                    dot={false}
+                  />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="mt-2 flex items-center justify-center gap-5 text-[11px]">
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full" style={{ background: 'var(--primary)' }} />
-            <span className="text-muted-foreground">{compareA}</span>
+            <span className="text-muted-foreground">{compareA ?? '—'}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full" style={{ background: 'var(--gold)' }} />
-            <span className="text-muted-foreground">{compareB}</span>
+            <span className="text-muted-foreground">{compareB ?? '—'}</span>
           </div>
         </div>
       </CardContent>
@@ -175,30 +191,22 @@ export function StockVsStock() {
 
 type PickerProps = {
   label: string;
-  value: string;
+  value: string | undefined;
   onChange: (v: string) => void;
+  stocks: Stock[];
   perf: number;
-  stockName: string;
-  stockSignal: (typeof stocks)[number]['signal'];
+  stock: Stock | undefined;
   colorVar: string;
 };
 
-function PickerPanel({
-  label,
-  value,
-  onChange,
-  perf,
-  stockName,
-  stockSignal,
-  colorVar,
-}: PickerProps) {
+function PickerPanel({ label, value, onChange, stocks, perf, stock, colorVar }: PickerProps) {
   const up = perf >= 0;
   return (
     <div className="border-border bg-muted/30 flex flex-col gap-2 rounded-lg border p-3">
       <span className="text-muted-foreground text-[10px] tracking-wider uppercase">{label}</span>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-full">
-          <SelectValue />
+          <SelectValue placeholder="Select stock" />
         </SelectTrigger>
         <SelectContent>
           {stocks.map((s) => (
@@ -208,12 +216,12 @@ function PickerPanel({
           ))}
         </SelectContent>
       </Select>
-      <span className="text-text-secondary truncate text-[11px]">{stockName}</span>
+      <span className="text-text-secondary truncate text-[11px]">{stock?.name ?? '—'}</span>
       <span className={cn('font-display text-[18px] font-bold')} style={{ color: colorVar }}>
         {up ? '+' : ''}
         {perf.toFixed(2)}%
       </span>
-      <SignalBadge signal={stockSignal} size="small" />
+      {stock && <SignalBadge signal={stock.signal} size="small" />}
     </div>
   );
 }

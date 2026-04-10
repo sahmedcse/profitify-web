@@ -16,7 +16,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
-  data: { t: number; macd: number; signal: number }[];
+  data: { t: number; macd: number; signal: number }[] | undefined;
 };
 
 function MacdTooltip({ active, payload }: TooltipContentProps<ValueType, NameType>) {
@@ -36,6 +36,8 @@ function MacdTooltip({ active, payload }: TooltipContentProps<ValueType, NameTyp
 }
 
 export function MacdChart({ data }: Props) {
+  const last = data && data.length > 0 ? data[data.length - 1] : undefined;
+  const bullish = last ? last.macd >= last.signal : true;
   return (
     <Card
       className="gap-3 rounded-[14px] border-0 py-5"
@@ -49,47 +51,57 @@ export function MacdChart({ data }: Props) {
         <CardAction>
           <Badge
             variant="secondary"
-            className="bg-accent-green-soft text-accent-green tracking-wider uppercase"
+            className={
+              bullish
+                ? 'bg-accent-green-soft text-accent-green tracking-wider uppercase'
+                : 'bg-loss-soft text-loss tracking-wider uppercase'
+            }
           >
-            Bullish
+            {bullish ? 'Bullish' : 'Bearish'}
           </Badge>
         </CardAction>
       </CardHeader>
       <CardContent className="px-5">
-        <ResponsiveContainer width="100%" height={160}>
-          <LineChart data={data} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-            <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-            <XAxis
-              dataKey="t"
-              tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-              axisLine={false}
-              tickLine={false}
-              interval={4}
-            />
-            <YAxis
-              tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-              axisLine={false}
-              tickLine={false}
-              width={36}
-            />
-            <Tooltip content={MacdTooltip} cursor={{ stroke: 'var(--border)' }} />
-            <Line
-              type="monotone"
-              dataKey="macd"
-              stroke="var(--primary)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="signal"
-              stroke="var(--loss)"
-              strokeWidth={2}
-              strokeDasharray="4 4"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {!data || data.length === 0 ? (
+          <div className="text-muted-foreground flex h-[160px] items-center justify-center rounded-md text-[11px]">
+            No MACD data yet
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={160}>
+            <LineChart data={data} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="t"
+                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                axisLine={false}
+                tickLine={false}
+                interval={4}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                axisLine={false}
+                tickLine={false}
+                width={36}
+              />
+              <Tooltip content={MacdTooltip} cursor={{ stroke: 'var(--border)' }} />
+              <Line
+                type="monotone"
+                dataKey="macd"
+                stroke="var(--primary)"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="signal"
+                stroke="var(--loss)"
+                strokeWidth={2}
+                strokeDasharray="4 4"
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );
