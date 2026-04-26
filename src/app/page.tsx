@@ -216,7 +216,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-border border-t py-8">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-2 px-6 md:flex-row md:items-center md:justify-between md:gap-0 md:px-12">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-6 md:px-12">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ProfitifyIcon size={28} />
@@ -224,9 +224,9 @@ export default function HomePage() {
                 profit<span className="text-accent-green">ify</span>
               </span>
             </div>
-            <div className="text-muted-foreground flex items-center gap-4 text-[13px] md:hidden">
+            <div className="text-muted-foreground flex items-center gap-4 text-[13px]">
               <a
-                href="https://github.com/sahmedcse/profitify-web"
+                href="https://github.com/sahmedcse"
                 className="hover:text-foreground transition-colors"
               >
                 GitHub
@@ -239,21 +239,9 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-          <div className="text-muted-foreground flex items-center justify-center gap-4 text-[13px] md:justify-end">
-            <span>&copy; 2026 Sadat Ahmed</span>
-            <a
-              href="https://github.com/sahmedcse/profitify-web"
-              className="hover:text-foreground hidden transition-colors md:inline"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://www.linkedin.com/in/sadatahmed4/"
-              className="hover:text-foreground hidden transition-colors md:inline"
-            >
-              LinkedIn
-            </a>
-          </div>
+          <span className="text-muted-foreground text-center text-[13px]">
+            &copy; 2026 Sadat Ahmed
+          </span>
         </div>
       </footer>
     </div>
