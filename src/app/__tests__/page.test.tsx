@@ -61,7 +61,7 @@ describe('HomePage', () => {
     const { container } = render(<HomePage />);
 
     expect(within(container).getByText('© 2026 Sadat Ahmed')).toBeInTheDocument();
-    expect(within(container).getAllByText('GitHub').length).toBeGreaterThanOrEqual(1);
-    expect(within(container).getAllByText('LinkedIn').length).toBeGreaterThanOrEqual(1);
+    expect(within(container).getByText('GitHub')).toBeInTheDocument();
+    expect(within(container).getByText('LinkedIn')).toBeInTheDocument();
   });
 });
