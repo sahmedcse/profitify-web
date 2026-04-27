@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Eye, BarChart3, Activity } from 'lucide-react';
 import { Navbar } from '@/components/home/navbar';
 import { HeroPreviewCard } from '@/components/home/hero-preview-card';
+import { PreviewTable } from '@/components/home/preview-table';
 import { ProfitifyIcon } from '@/components/icons/profitify-icon';
 
 export const metadata: Metadata = {
@@ -39,51 +40,6 @@ const features = [
   },
 ];
 
-const stocks = [
-  {
-    symbol: 'AAPL',
-    name: 'Apple Inc.',
-    price: '$198.45',
-    change: '+1.19%',
-    up: true,
-    signal: 'Bullish',
-  },
-  {
-    symbol: 'NVDA',
-    name: 'NVIDIA Corp.',
-    price: '$924.67',
-    change: '+2.04%',
-    up: true,
-    signal: 'Strong Buy',
-  },
-  {
-    symbol: 'TSLA',
-    name: 'Tesla Inc.',
-    price: '$248.90',
-    change: '-2.23%',
-    up: false,
-    signal: 'Neutral',
-  },
-  {
-    symbol: 'MSFT',
-    name: 'Microsoft',
-    price: '$452.12',
-    change: '-0.71%',
-    up: false,
-    signal: 'Bullish',
-  },
-  {
-    symbol: 'AMZN',
-    name: 'Amazon.com',
-    price: '$186.34',
-    change: '+1.02%',
-    up: true,
-    signal: 'Bullish',
-  },
-];
-
-const sparkHeights = [14, 22, 18, 28, 24, 30, 26];
-
 const steps = [
   {
     num: '01',
@@ -103,14 +59,6 @@ const steps = [
       'Use our readings alongside your own research. We provide the data — you make the call.',
   },
 ];
-
-/* ═══ Helpers ═══ */
-
-function signalColor(signal: string): string {
-  if (signal === 'Neutral') return 'var(--muted-foreground)';
-  if (signal.includes('Buy')) return 'var(--accent-green)';
-  return 'var(--primary)';
-}
 
 /* ═══ Page ═══ */
 
@@ -219,67 +167,7 @@ export default function HomePage() {
             What you&apos;ll see
           </h2>
 
-          <div
-            className="border-border bg-card mt-12 overflow-hidden rounded-2xl border"
-            style={{ boxShadow: 'var(--card-shadow)' }}
-          >
-            {/* Table header */}
-            <div
-              className="border-border text-muted-foreground grid items-center border-b px-5 py-3 text-[12px] font-semibold tracking-[0.08em] uppercase"
-              style={{ gridTemplateColumns: '160px 1fr 100px 100px 110px' }}
-            >
-              <span>Stock</span>
-              <span />
-              <span className="text-right">Price</span>
-              <span className="text-right">Change</span>
-              <span className="text-right">Signal</span>
-            </div>
-
-            {/* Table rows */}
-            {stocks.map((s) => (
-              <div
-                key={s.symbol}
-                className="border-border grid items-center border-b px-5 py-3 last:border-b-0"
-                style={{ gridTemplateColumns: '160px 1fr 100px 100px 110px' }}
-              >
-                <div>
-                  <span className="font-display text-[15px] font-bold">{s.symbol}</span>
-                  <span className="text-muted-foreground ml-2 text-[13px]">{s.name}</span>
-                </div>
-                {/* Sparkline */}
-                <div className="flex items-end gap-[3px] px-4">
-                  {sparkHeights.map((h, i) => (
-                    <div
-                      key={i}
-                      className="w-[4px] rounded-sm"
-                      style={{
-                        height: `${h}px`,
-                        backgroundColor: s.up ? 'var(--accent-green)' : 'var(--loss)',
-                        opacity: 0.3 + (i / 6) * 0.6,
-                      }}
-                    />
-                  ))}
-                </div>
-                <span className="font-display text-right text-[14px] font-bold">{s.price}</span>
-                <span
-                  className="text-right text-[14px] font-semibold"
-                  style={{ color: s.up ? 'var(--profit)' : 'var(--loss)' }}
-                >
-                  {s.change}
-                </span>
-                <span
-                  className="text-right text-[13px] font-semibold"
-                  style={{ color: signalColor(s.signal) }}
-                >
-                  {s.signal}
-                </span>
-              </div>
-            ))}
-
-            <div className="text-muted-foreground px-5 py-3 text-[13px] italic">
-              Sample data shown for illustration. Live data available at launch.
-            </div>
-          </div>
+          <PreviewTable />
         </div>
       </section>
 
@@ -328,28 +216,32 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-border border-t py-8">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 md:px-12">
-          <div className="flex items-center gap-2">
-            <ProfitifyIcon size={28} />
-            <span className="font-display text-[15px] font-bold">
-              profit<span className="text-accent-green">ify</span>
-            </span>
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-6 md:px-12">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ProfitifyIcon size={28} />
+              <span className="font-display text-[15px] font-bold">
+                profit<span className="text-accent-green">ify</span>
+              </span>
+            </div>
+            <div className="text-muted-foreground flex items-center gap-4 text-[13px]">
+              <a
+                href="https://github.com/sahmedcse"
+                className="hover:text-foreground transition-colors"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://www.linkedin.com/in/sadatahmed4/"
+                className="hover:text-foreground transition-colors"
+              >
+                LinkedIn
+              </a>
+            </div>
           </div>
-          <div className="text-muted-foreground flex items-center gap-4 text-[13px]">
-            <span>&copy; 2026 Sadat Ahmed</span>
-            <a
-              href="https://github.com/sahmedcse/profitify-web"
-              className="hover:text-foreground transition-colors"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://www.linkedin.com/in/sadatahmed4/"
-              className="hover:text-foreground transition-colors"
-            >
-              LinkedIn
-            </a>
-          </div>
+          <span className="text-muted-foreground text-center text-[13px]">
+            &copy; 2026 Sadat Ahmed
+          </span>
         </div>
       </footer>
     </div>
